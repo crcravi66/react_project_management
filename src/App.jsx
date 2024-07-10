@@ -3,11 +3,41 @@ import NewProject from "./components/NewProject.jsx";
 import NoProjectSelected from "./components/NoProjectSelected.jsx";
 import ProjectsSidebar from "./components/ProjsctsSlidebar.jsx";
 import SelectedProject from "./components/SelectedProject.jsx";
+import NewTasks from "./components/NewTasks.jsx";
 
 
 function App() {
 
-  const [projectState, setProjectState] = useState({ selectedProjectId: undefined, projects: [] })
+  const [projectState, setProjectState] = useState({
+    selectedProjectId: undefined,
+    projects: [],
+    tasks: []
+  })
+
+  function handleAddTask(text) {
+    setProjectState(prevState => {
+      const taskId = Math.random()
+      const newTask = {
+        text: text,
+        projectId: prevState.selectedProjectId,
+        id: taskId
+      }
+      return {
+        ...prevState,
+        tasks: [newTask, ...prevState.tasks]
+      }
+    })
+  }
+  function handleDeletetask(id) {
+    setProjectState(preveState => {
+      return {
+        ...preveState,
+        tasks: preveState.tasks.filter((task) => task.id !== id
+        )
+      }
+    })
+  }
+
 
   function handleSelectProject(id) {
     setProjectState(preveState => {
@@ -65,7 +95,15 @@ function App() {
 
   const selectedProject = projectState.projects.find((project) => project.id === projectState.selectedProjectId)
 
-  let content = <SelectedProject project={selectedProject} onDelete={handleDeleteProject} />;
+  let content = (
+    <SelectedProject
+      project={selectedProject}
+      onDelete={handleDeleteProject}
+      onAddTask={handleAddTask}
+      onDeleteTask={handleDeletetask}
+      tasks={projectState.tasks}
+    />
+  )
 
   if (projectState.selectedProjectId === null) {
     content = <NewProject onAdd={handleAddProject} onCancel={handleCancelAddProject} />
@@ -79,6 +117,7 @@ function App() {
         onStartAddProject={handleStartAddProject}
         projects={projectState.projects}
         onSelectProject={handleSelectProject}
+        selectedProjectId={projectState.selectedProjectId}
       />
       {content}
     </main>
